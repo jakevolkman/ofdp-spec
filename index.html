@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OFDP — Open Financial Data Protocol</title>
+  <meta name="description" content="A consumer-owned, federated, open standard for personal financial data." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --text: #e8e8e8;
+      --muted: #888888;
+      --accent: #4ade80;
+      --accent-dim: #22c55e20;
+      --mono: 'Courier New', Courier, monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 96px 0; }
+    section + section { border-top: 1px solid var(--border); }
+
+    /* ── Nav ── */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--text);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── Hero ── */
+    #hero {
+      padding: 120px 0 96px;
+      border-top: none;
+    }
+
+    .hero-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 700;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-bottom: 24px;
+      max-width: 800px;
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 40px;
+      line-height: 1.65;
+    }
+
+    .btn-group { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 22px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity .15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { opacity: .85; text-decoration: none; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { border-color: #333; }
+
+    /* ── Section titles ── */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: #ffffff;
+      margin-bottom: 48px;
+      line-height: 1.15;
+    }
+
+    /* ── Cards ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 28px;
+    }
+
+    .card-title {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ── What OFDP Is ── */
+    .ofdp-body {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+      max-width: 680px;
+      margin-bottom: 48px;
+    }
+
+    /* ── Compat table ── */
+    .compat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .compat-row {
+      background: var(--surface);
+      padding: 20px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .compat-tag {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid #22c55e40;
+      border-radius: 4px;
+      padding: 3px 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .compat-desc {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* ── Status ── */
+    .status-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .version-badge {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid #22c55e40;
+      border-radius: 4px;
+      padding: 4px 10px;
+    }
+
+    .status-note {
+      color: var(--muted);
+      font-size: 15px;
+      max-width: 600px;
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      max-width: 640px;
+    }
+
+    .timeline-item {
+      background: var(--surface);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .timeline-item:last-child { border-bottom: none; }
+
+    .tl-version {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      min-width: 90px;
+      flex-shrink: 0;
+    }
+
+    .tl-status {
+      font-size: 11px;
+      font-family: var(--mono);
+      padding: 2px 8px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .tl-status.current {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid #22c55e40;
+    }
+
+    .tl-status.planned {
+      background: #ffffff08;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .tl-desc {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+
+    footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .footer-license {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-domain {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .footer-right a {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .footer-right a:hover { color: var(--text); }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      section { padding: 64px 0; }
+      #hero { padding: 72px 0 64px; }
+
+      .nav-links { display: none; }
+
+      .timeline-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      footer .container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav aria-label="Main navigation">
+    <div class="container">
+      <span class="nav-logo">OFDP</span>
+      <ul class="nav-links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#what">What It Is</a></li>
+        <li><a href="#compat">Standards</a></li>
+        <li><a href="#status">Status</a></li>
+        <li><a href="https://github.com/jakevolkman/ofdp-spec">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="container">
+      <p class="hero-label">Open Financial Data Protocol</p>
+      <h1>Open Financial Data Protocol</h1>
+      <p class="hero-sub">A consumer-owned, federated, open standard for personal financial data.</p>
+      <div class="btn-group">
+        <a class="btn btn-primary" href="https://github.com/jakevolkman/ofdp-spec">Read the Specification</a>
+        <a class="btn btn-secondary" href="https://github.com/jakevolkman/ofdp-spec/issues">Follow Development</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section id="problem">
+    <div class="container">
+      <p class="section-label">Context</p>
+      <h2>The Problem</h2>
+      <div class="card-grid">
+        <div class="card">
+          <p class="card-title">Fragmented</p>
+          <p>Consumer financial data is scattered across hundreds of institutions with incompatible formats and no standard way to access it.</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Intermediated</p>
+          <p>Aggregators like Plaid and MX charge institutions for access to data consumers generated, creating misaligned incentives.</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Opaque</p>
+          <p>No standard provenance model means consumers and AI agents can't tell where data came from or how much to trust it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What OFDP Is -->
+  <section id="what">
+    <div class="container">
+      <p class="section-label">Overview</p>
+      <h2>What OFDP Is</h2>
+      <p class="ofdp-body">
+        OFDP is a data layer — not a payment system. It defines how financial data is structured, stored, shared, and verified across institutions, applications, and AI systems. It is designed to complement FDX and Section 1033 infrastructure by adding a consumer sovereignty layer.
+      </p>
+      <div class="card-grid">
+        <div class="card">
+          <p class="card-title">Consumer Owned</p>
+          <p>Your instance is the authoritative source for your financial identity. Institutions are data sources, not data owners.</p>
+        </div>
+        <div class="card">
+          <p class="card-title">AI Native</p>
+          <p>Structured, normalized data designed to be consumed by AI agents without transformation.</p>
+        </div>
+        <div class="card">
+          <p class="card-title">Self Hostable</p>
+          <p>Runs on modest hardware. No cloud dependency required.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Standards Compatibility -->
+  <section id="compat">
+    <div class="container">
+      <p class="section-label">Interoperability</p>
+      <h2>Built to Coexist</h2>
+      <div class="compat-grid" role="list">
+        <div class="compat-row" role="listitem">
+          <span class="compat-tag">FDX</span>
+          <p class="compat-desc">OFDP consumes FDX-compliant APIs as a data source</p>
+        </div>
+        <div class="compat-row" role="listitem">
+          <span class="compat-tag">ISO 20022</span>
+          <p class="compat-desc">Transaction fields map directly to OFDP schema</p>
+        </div>
+        <div class="compat-row" role="listitem">
+          <span class="compat-tag">OAuth 2.0</span>
+          <p class="compat-desc">Foundation for all ConnectionRequest authorization</p>
+        </div>
+        <div class="compat-row" role="listitem">
+          <span class="compat-tag">MCP</span>
+          <p class="compat-desc">OFDP instances expose MCP servers for AI agent access</p>
+        </div>
+        <div class="compat-row" role="listitem">
+          <span class="compat-tag">Section 1033</span>
+          <p class="compat-desc">OFDP is the consumer layer above institutional infrastructure</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Status -->
+  <section id="status">
+    <div class="container">
+      <p class="section-label">Roadmap</p>
+      <h2>Current Status</h2>
+      <div class="status-header">
+        <span class="version-badge">v0.1 — Draft Specification</span>
+      </div>
+      <p class="status-note">Open for comment from financial institutions, credit unions, fintech developers, and consumer advocates.</p>
+      <div class="timeline" role="list">
+        <div class="timeline-item" role="listitem">
+          <span class="tl-version">v0.1</span>
+          <span class="tl-status current">Current</span>
+          <span class="tl-desc">Draft specification</span>
+        </div>
+        <div class="timeline-item" role="listitem">
+          <span class="tl-version">v0.2</span>
+          <span class="tl-status planned">Planned</span>
+          <span class="tl-desc">Reference implementation + compliance test suite</span>
+        </div>
+        <div class="timeline-item" role="listitem">
+          <span class="tl-version">v0.3</span>
+          <span class="tl-status planned">Planned</span>
+          <span class="tl-desc">Registry launch + first institutional certifications</span>
+        </div>
+        <div class="timeline-item" role="listitem">
+          <span class="tl-version">v1.0</span>
+          <span class="tl-status planned">Planned</span>
+          <span class="tl-desc">Stable specification + FDX interoperability validated</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-left">
+        <p class="footer-license">OFDP is an open specification. Apache 2.0 License.</p>
+        <p class="footer-domain">ofdp.dev</p>
+      </div>
+      <div class="footer-right">
+        <a href="https://github.com/jakevolkman/ofdp-spec">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
