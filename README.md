@@ -196,7 +196,9 @@ OFDP is being developed as an open specification. The goal is a protocol that an
 
 Feedback, corrections, and proposals for extension modules are welcome. Open an issue or submit a pull request.
 
-The full specification is in [`OFDP_Specification_v0.1.docx`](OFDP_Specification_v0.1.docx).
+The full specification is in [`OFDP_Specification_v0.1.1.docx`](OFDP_Specification_v0.1.1.docx). (Previous draft: [`OFDP_Specification_v0.1.docx`](OFDP_Specification_v0.1.docx).)
+
+**v0.1.1 (June 2026):** added §2.5 Record Matching and Deduplication (external-ID → fingerprint → fuzzy window → balance reconciliation cascade) and §2.6 Sourced Facts and Annotations (user annotations are never overwritten by sync); added `Transaction.external_id` and `ProvenanceBase.overridden_by_user`; documented the non-negative amount convention; made MCC-derived category fields nullable; the standard category taxonomy will ship as a versioned machine-readable artifact (slugs + MCC mapping).
 
 ## License
 
